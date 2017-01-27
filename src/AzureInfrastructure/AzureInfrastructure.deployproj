@@ -33,7 +33,6 @@
     </None>
     <Content Include="Deploy-AzureResourceGroup.ps1" />
     <None Include="Microsoft.Eventhub\azuredeploy.json" />
-    <None Include="Microsoft.HDInsight\azuredeploy.development.parameters.json" />
     <None Include="Microsoft.HDInsight\azuredeploy.json" />
     <None Include="Microsoft.ServiceBus\azuredeploy.json" />
     <None Include="Microsoft.Sql\azuredeploy.json" />

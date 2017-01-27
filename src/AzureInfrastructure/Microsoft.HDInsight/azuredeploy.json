@@ -291,15 +291,7 @@
               "virtualNetworkProfile": {
                 "id": "[variables('vnetId')]",
                 "subnet": "[variables('subnetRef')]"
-              },
-              "scriptActions": [
-                {
-                  "name": "AnacondaPython3",
-                  "uri": "https://greenhdclusterstore.blob.core.windows.net/greenhdclusterstore/conda.sh",
-                  "isHeadNode": true,
-                  "isWorkerNode": true
-                }
-              ]
+              }             
             },
             {
               "name": "workernode",
@@ -316,15 +308,7 @@
               "virtualNetworkProfile": {
                 "id": "[variables('vnetId')]",
                 "subnet": "[variables('subnetRef')]"
-              },
-              "scriptActions": [
-                {
-                  "name": "AnacondaPython3",
-                  "uri": "https://greenhdclusterstore.blob.core.windows.net/greenhdclusterstore/conda.sh",
-                  "isHeadNode": true,
-                  "isWorkerNode": true
-                }
-              ]
+              }
             }
           ]
         }
