@@ -91,7 +91,7 @@
         },
         "collation": {
             "type": "string",
-            "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+            "defaultValue": "SQL_Latin1_General_Cp1_CI_AS",
             "allowedValues": [
                 "SQL_Latin1_General_Cp437_CS_AS",
                 "SQL_Latin1_General_Cp437_CI_AS",
