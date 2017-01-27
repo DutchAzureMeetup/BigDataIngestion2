@@ -1,0 +1,45 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configuration": {
+      "type": "object",
+      "metadata": {
+        "description": "Configuration for this resource"
+      }
+    }
+  },
+  "variables": {
+    "virtualNetworkName": "[concat(parameters('configuration').projectName,'-vnet-',parameters('configuration').environment)]"
+  },
+  "resources": [
+    { 
+      "apiVersion": "2015-06-15",
+      "name": "[variables('virtualNetworkName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "Subnet",
+            "properties": {
+              "addressPrefix": "10.0.0.0/24"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "virtualNetworkName": {
+      "type": "string",
+      "value": "[variables('virtualNetworkName')]"
+    },
+   
+  }
+}

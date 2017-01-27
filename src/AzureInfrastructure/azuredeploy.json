@@ -1,0 +1,316 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 20
+    },
+    "eventHubName": {
+      "type": "string",
+      "defaultValue": "dambd",
+      "metadata": {
+        "description": "Name of the Event Hub"
+      }
+    },
+    "environment": {
+      "type": "string",
+      "defaultValue": "dev",
+      "minLength": 3,
+      "maxLength": 4,
+      "metadata": {
+        "description": "Environment name, like dev, test etc.."
+      }
+    }
+  },
+  "variables": {
+    "configuration": {
+      "projectName": "[parameters('projectname')]",
+      "owner": "dutchazuremeetup",
+      "costCenter": "AB1234",
+      "businessUnit": "meetup",
+      "environment": "[parameters('environment')]"
+    },
+    "repoUrl": "https://github.com/DutchAzureMeetup/BigDataIngestion1.git",
+    "branch": "master",
+    "resourceGroupName":  "[resourceGroup().name]",
+    "sqlAdministratorLogin": "bigdatauser",
+    "sqlAdministratorLoginPassword": "@T0psecret12",
+    "sqlEdition": "Basic",
+    "hdInsightClusterLoginUserName": "bigdatauser",
+    "hdInsightClusterLoginPassword": "@T0psecret12",
+    "hdInsightSshUserName": "bigdatauser",
+    "hdInsightSshPassword": "@T0psecret12"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-01-01",
+      "name": "EventHub",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          //Dit must be a public url (in Linked template local file system is not supported)
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/src/AzureInfrastructure/Microsoft.Eventhub/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          },
+          "eventHubName": {
+            "value": "[parameters('eventHubName')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "StorageAccount",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          //Dit must be a public url (in Linked template local file system is not supported)
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/src/AzureInfrastructure/Microsoft.Storage/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "ServiceBus",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          //Dit must be a public url (in Linked template local file system is not supported)
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/src/AzureInfrastructure/Microsoft.ServiceBus/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "StreamAnalytics",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          //Dit must be a public url (in Linked template local file system is not supported)
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/src/AzureInfrastructure/Microsoft.StreamAnalytics/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          },
+          "eventHubNamespace": {
+            "value": "[reference('EventHub').outputs.NamespaceName.value]"
+          },
+          "eventhubListenPolicyName": {
+            "value": "[reference('EventHub').outputs.EventHubListenOnlyPolicyPrimaryKeyName.value]"
+          },
+          "eventHubName": {
+            "value": "[parameters('eventHubName')]"
+          },
+          "consumerGroupName": {
+            "value": "[reference('EventHub').outputs.ConsumerGroupName.value]"
+          },
+          "storageAccountName": {
+            "value": "[reference('StorageAccount').outputs.StorageAccountName.value]"
+          },
+          "serviceBusNamespace": {
+            "value": "[reference('ServiceBus').outputs.ServiceBusNamespaceName.value]"
+          },
+          "serviceBusTopicName": {
+            "value": "[reference('ServiceBus').outputs.Topic.value.Name]"
+          },
+          "serviceBusTopicPolicyName": {
+            "value": "[reference('ServiceBus').outputs.ServiceBusDefaultSASKeyName.value]"
+          }
+        }
+      }
+    },
+    { // App Plan
+      "apiVersion": "2015-01-01",
+      "name": "AppPlan",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/src/AzureInfrastructure/Microsoft.Web/azuredeploy-plan.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          }
+        }
+      }
+    },
+    {
+      //Web App
+      "apiVersion": "2015-01-01",
+      "name": "WebApp",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/src/AzureInfrastructure/Microsoft.Web/azuredeploy-webapp.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          },
+          "serverFarmName": {
+            "value": "[reference('AppPlan').outputs.ServerFarmName.value]"
+          },
+          "sbConnectionString": {
+            "value": "[reference('ServiceBus').outputs.ServiceBusNamespaceConnectionString.value]"
+          },
+          "topicName": {
+            "value": "[reference('ServiceBus').outputs.Topic.value.Name]"
+          },
+          "subscriptionName": {
+            "value": "[reference('ServiceBus').outputs.Topic.value.Subscriptions[0].name]"
+          },
+          "storageAccountConnectionString": {
+            "value": "[reference('StorageAccount').outputs.StorageAccountConnectionString.value]"
+          },
+          "repoUrl": {
+            "value": "[variables('repoUrl')]"
+          },
+          "branch": {
+            "value": "[variables('branch')]"
+          },
+          "ehConnectionString":{
+            "value": "[reference('EventHub').outputs.EventHubSendOnlyConnectionString.value]"
+          }
+        }
+      }
+    },
+    {
+      //SQL
+      "apiVersion": "2015-01-01",
+      "name": "Sql",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/src/AzureInfrastructure/Microsoft.Sql/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          },
+          "administratorLogin": {
+            "value": "[variables('sqlAdministratorLogin')]"
+          },
+          "administratorLoginPassword": {
+            "value": "[variables('sqlAdministratorLoginPassword')]"
+          },
+          "edition": {
+            "value": "[variables('sqlEdition')]"
+          }
+        }
+      }
+    },
+    {
+      //VNet
+      "apiVersion": "2015-01-01",
+      "name": "VNet",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/src/AzureInfrastructure/Microsoft.VNet/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          }
+        }
+      }
+    },
+    {
+      //HDInsight
+      "apiVersion": "2015-01-01",
+      "name": "HDInsight",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/src/AzureInfrastructure/Microsoft.HDInsight/azuredeploy.json",
+          "contentVersion": "1.0.0.0"
+        },
+
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          },
+          "clusterLoginUserName": {
+            "value": "[variables('hdInsightClusterLoginUserName')]"
+          },
+          "clusterLoginPassword": {
+            "value": "[variables('hdInsightClusterLoginPassword')]"
+          },
+          "sshUserName": {
+            "value": "[variables('hdInsightSshUserName')]"
+          },
+          "sshPassword": {
+            "value": "[variables('hdInsightSshPassword')]"
+          },
+          "headVmSize": {
+            "value": "Standard_D1"
+          },
+          "workerVmSize": {
+            "value": "Standard_D1"
+          },
+          "sqlServerName": {
+            "value": "[reference('Sql').outputs.sqlServerName.value]"
+          },
+          "sqlMetastoreDatabaseName": {
+            "value": "[reference('Sql').outputs.databaseName.value]"
+          },
+          "sqlDatabaseUserName": {
+            "value": "[variables('sqlAdministratorLogin')]"
+          },
+          "sqlDatabasePassword": {
+            "value": "[variables('sqlAdministratorLoginPassword')]"
+          },
+          "clusterWorkerNodeCount": {
+            "value": "1"
+          },
+          "datalakeResourceGroupName": {
+            "value": "[variables('resourceGroupName')]"
+          },
+          "rawdataStorageAccountName": {
+            "value": "[reference('StorageAccount').outputs.StorageAccountName.value]"
+          },
+          "virtualNetworkName": {
+            "value": "[reference('VNet').outputs.virtualNetworkName.value]"
+          },
+          "virtualNetworkResourceGroup": {
+            "value": "[variables('resourceGroupName')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

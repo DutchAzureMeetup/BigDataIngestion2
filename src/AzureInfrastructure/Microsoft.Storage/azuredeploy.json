@@ -1,0 +1,56 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configuration": {
+      "type": "object",
+      "metadata": {
+        "description": "Configuration for this resource"
+      }
+    }
+  },
+  "variables": {
+    "storageAccountName": "[concat(parameters('configuration').projectName,parameters('configuration').environment)]",
+    "endPoints": "[concat(';BlobEndpoint=https://',variables('storageAccountName'),'.blob.core.windows.net/;TableEndpoint=https://',variables('storageAccountName'),'.table.core.windows.net/;QueueEndpoint=https://',variables('storageAccountName'),'.queue.core.windows.net/;FileEndpoint=https://',variables('storageAccountName'),'.file.core.windows.net/')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-01-01",
+      "name": "[variables('storageAccountName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "projectName": "[parameters('configuration').projectName]",
+        "environment": "[parameters('configuration').environment]"
+      },
+      "properties": {
+        "encryption": {
+          "services": {
+            "blob": {
+              "enabled": false
+            }
+          },
+          "keySource": "Microsoft.Storage"
+        }
+      },
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "Storage"
+    }
+  ],
+  "outputs": {
+    "StorageAccountConnectionString": {
+      "type": "string",
+      "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listKeys(variables('storageAccountName'), '2016-01-01').keys[0].value,variables('endPoints'))]"
+    },
+    "StorageAccountName": {
+      "type": "string",
+      "value": "[variables('storageAccountName')]"
+    },
+    "StorageAccountKey": {
+      "type": "string",
+      "value": "[listKeys(variables('storageAccountName'), '2016-01-01').keys[0].value]"
+    }
+  }
+}

@@ -1,0 +1,340 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configuration": {
+      "type": "object"
+    },    
+    "clusterLoginUserName": {
+      "type": "string",
+      "defaultValue": "admin",
+      "metadata": {
+        "description": "These credentials can be used to submit jobs to the cluster and to log into cluster dashboards."
+      }
+    },
+    "clusterLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
+      }
+    },
+    "sshUserName": {
+      "type": "string",
+      "defaultValue": "sshuser",
+      "metadata": {
+        "description": "These credentials can be used to remotely access the cluster."
+      }
+    },
+    "sshPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password must be at least 10 characters in length and must contain at least one digit, one non-alphanumeric character, and one upper or lower case letter."
+      }
+    },
+    "headVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D3",
+      "allowedValues": [
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D11",
+        "Standard_D12",
+        "Standard_D13",
+        "Standard_D14",
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2",
+        "Standard_D5_v2",
+        "Standard_D11_v2",
+        "Standard_D12_v2",
+        "Standard_D13_v2",
+        "Standard_D14_v2",
+        "Standard_G1",
+        "Standard_G2",
+        "Standard_G3",
+        "Standard_G4",
+        "Standard_G5",
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS11",
+        "Standard_DS12",
+        "Standard_DS13",
+        "Standard_DS14",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS5"
+      ],
+      "metadata": {
+        "description": "The size of the Virtual Machine."
+      }
+    },
+    "workerVmSize": {
+      "type": "string",
+      "defaultValue": "Standard_D3",
+      "allowedValues": [
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D11",
+        "Standard_D12",
+        "Standard_D13",
+        "Standard_D14",
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2",
+        "Standard_D5_v2",
+        "Standard_D11_v2",
+        "Standard_D12_v2",
+        "Standard_D13_v2",
+        "Standard_D14_v2",
+        "Standard_G1",
+        "Standard_G2",
+        "Standard_G3",
+        "Standard_G4",
+        "Standard_G5",
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS11",
+        "Standard_DS12",
+        "Standard_DS13",
+        "Standard_DS14",
+        "Standard_GS1",
+        "Standard_GS2",
+        "Standard_GS3",
+        "Standard_GS4",
+        "Standard_GS5"
+      ],
+      "metadata": {
+        "description": "The size of the Virtual Machine."
+      }
+    },
+
+    "sqlServerName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Azure SQL Server for the metadata store."
+      }
+    },
+    "sqlMetastoreDatabaseName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Azure SQL Database for the metadata store."
+      }
+    },
+
+    "sqlDatabaseUserName": {
+      "type": "string",
+      "defaultValue": "sqluser",
+      "metadata": {
+        "description": "These credentials can be used to access the metadatastore."
+      }
+    },
+    "sqlDatabasePassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password to access the metadatastore"
+      }
+    },
+    "clusterType": {
+      "type": "string",
+      "defaultValue": "spark",
+      "allowedValues": [
+        "hadoop",
+        "hbase",
+        "storm",
+        "spark"
+      ],
+      "metadata": {
+        "description": "The type of the HDInsight cluster to create."
+      }
+    },
+    "clusterWorkerNodeCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "The number of nodes in the HDInsight cluster."
+      }
+    },
+    "datalakeResourceGroupName": {
+      "type": "string",
+      "defaultValue": "sqluser",
+      "metadata": {
+        "description": "These credentials can be used to access the metadatastore."
+      }
+    },
+    "rawdataStorageAccountName": {
+      "type": "string",
+      "defaultValue": "sqluser",
+      "metadata": {
+        "description": "These credentials can be used to access the metadatastore."
+      }
+    },
+    "clusterStorageAccountName": {
+      "type": "string",
+      "defaultValue": "sqluser",
+      "metadata": {
+        "description": "These credentials can be used to access the metadatastore."
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the vnet of the hdinsight cluster"
+      }
+    },
+    "virtualNetworkResourceGroup": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the resourcegroup where the vnet exists"
+      }
+    }
+  },
+  "variables": {
+    "defaultApiVersion": "2015-05-01-preview",
+    "clusterApiVersion": "2015-03-01-preview",
+    "subnetName": "Subnet",
+    "vnetId": "[resourceId(parameters('virtualNetworkResourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
+    "clusterName": "[concat(parameters('configuration').projectName,'-hdi-',parameters('configuration').environment)]"
+  },
+  "resources": [
+    {
+      "name": "[variables('clusterName')]",
+      "type": "Microsoft.HDInsight/clusters",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[variables('clusterApiVersion')]",
+      "tags": {
+        "projectName": "[parameters('configuration').projectName]",
+        "environment": "[parameters('configuration').environment]"
+      },
+      "properties": {
+        "clusterVersion": "3.5",
+        "osType": "Linux",
+        "tier": "standard",
+        "clusterDefinition": {
+          "kind": "[parameters('clusterType')]",
+          "componentVersion": {
+            "Spark": "2.0"
+          },
+          "configurations": {
+            "gateway": {
+              "restAuthCredential.isEnabled": true,
+              "restAuthCredential.username": "[parameters('clusterLoginUserName')]",
+              "restAuthCredential.password": "[parameters('clusterLoginPassword')]"
+            },
+            "core-site": { // Use the following to couple blob storage to the HDInsight cluster (access through wasb)
+              "fs.defaultFS": "[concat('wasb://',parameters('clusterStorageAccountName'),'@',parameters('clusterStorageAccountName'),'.blob.core.windows.net')]",
+              "[concat('fs.azure.account.key.',parameters('clusterStorageAccountName'),'.blob.core.windows.net')]": "[listKeys(resourceId(parameters('datalakeResourceGroupName'),'Microsoft.Storage/storageAccounts/',parameters('clusterStorageAccountName')), variables('defaultApiVersion')).key1]",
+              "[concat('fs.azure.account.key.',parameters('rawdataStorageAccountName'),'.blob.core.windows.net')]": "[listKeys(resourceId(parameters('datalakeResourceGroupName'),'Microsoft.Storage/storageAccounts/',parameters('rawdataStorageAccountName')), variables('defaultApiVersion')).key1]"
+            },
+            "hive-site": {
+              "javax.jdo.option.ConnectionDriverName": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+              "javax.jdo.option.ConnectionURL": "[concat('jdbc:sqlserver://',parameters('sqlServerName'),'.database.secure.windows.net',';database=',parameters('sqlMetastoreDatabaseName'),';encrypt=true;trustServerCertificate=true;create=false;loginTimeout=300')]",
+              "javax.jdo.option.ConnectionUserName": "[parameters('sqlDatabaseUserName')]",
+              "javax.jdo.option.ConnectionPassword": "[parameters('sqlDatabasePassword')]"
+            },
+            "hive-env": {
+              "hive_database": "Existing MSSQL Server database with SQL authentication",
+              "hive_database_name": "[parameters('sqlMetastoreDatabaseName')]",
+              "hive_database_type": "mssql",
+              "hive_existing_mssql_server_database": "[parameters('sqlMetastoreDatabaseName')]",
+              "hive_existing_mssql_server_host": "[concat(parameters('sqlServerName'),'.database.secure.windows.net')]",
+              "hive_hostname": "[concat(parameters('sqlServerName'),'.database.secure.windows.net')]"
+            },
+            "oozie-site": {
+              "oozie.service.JPAService.jdbc.driver": "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+              "oozie.service.JPAService.jdbc.url": "[concat('jdbc:sqlserver://',parameters('sqlServerName'),'.database.secure.windows.net',';database=',parameters('sqlMetastoreDatabaseName'),';encrypt=true;trustServerCertificate=true;create=false;loginTimeout=300')]",
+              "oozie.service.JPAService.jdbc.username": "[parameters('sqlDatabaseUserName')]",
+              "oozie.service.JPAService.jdbc.password": "[parameters('sqlDatabasePassword')]",
+              "oozie.db.schema.name": "oozie"
+            },
+            "oozie-env": {
+              "oozie_database": "Existing MSSQL Server database with SQL authentication",
+              "oozie_database_name": "[parameters('sqlMetastoreDatabaseName')]",
+              "oozie_database_type": "mssql",
+              "oozie_existing_mssql_server_database": "[parameters('sqlMetastoreDatabaseName')]",
+              "oozie_existing_mssql_server_host": "[concat(parameters('sqlServerName'),'.database.secure.windows.net')]",
+              "oozie_hostname": "[concat(parameters('sqlServerName'),'.database.secure.windows.net')]"
+            }
+          }
+        },
+        "storageProfile": {
+          "storageaccounts": [
+
+          ]
+        },
+        "computeProfile": {
+          "roles": [
+            {
+              "name": "headnode",
+              "targetInstanceCount": "2",
+              "hardwareProfile": {
+                "vmSize": "[parameters('headVmSize')]"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "[parameters('sshUserName')]",
+                  "password": "[parameters('sshPassword')]"
+                }
+              },
+              "virtualNetworkProfile": {
+                "id": "[variables('vnetId')]",
+                "subnet": "[variables('subnetRef')]"
+              },
+              "scriptActions": [
+                {
+                  "name": "AnacondaPython3",
+                  "uri": "https://greenhdclusterstore.blob.core.windows.net/greenhdclusterstore/conda.sh",
+                  "isHeadNode": true,
+                  "isWorkerNode": true
+                }
+              ]
+            },
+            {
+              "name": "workernode",
+              "targetInstanceCount": "[parameters('clusterWorkerNodeCount')]",
+              "hardwareProfile": {
+                "vmSize": "[parameters('workerVmSize')]"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "[parameters('sshUserName')]",
+                  "password": "[parameters('sshPassword')]"
+                }
+              },
+              "virtualNetworkProfile": {
+                "id": "[variables('vnetId')]",
+                "subnet": "[variables('subnetRef')]"
+              },
+              "scriptActions": [
+                {
+                  "name": "AnacondaPython3",
+                  "uri": "https://greenhdclusterstore.blob.core.windows.net/greenhdclusterstore/conda.sh",
+                  "isHeadNode": true,
+                  "isWorkerNode": true
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "cluster": {
+      "type": "object",
+      "value": "[reference(resourceId('Microsoft.HDInsight/clusters',variables('clusterName')))]"
+    }
+  }
+}

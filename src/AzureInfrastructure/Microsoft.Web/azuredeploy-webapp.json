@@ -1,0 +1,100 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configuration": {
+      "type": "object"
+    },
+    "serverFarmName": {
+      "type": "string"
+    },
+    "sbConnectionString": {
+      "type": "string"
+    },
+    "topicName": {
+      "type": "string"
+    },
+    "subscriptionName": {
+      "type": "string"
+    },
+    "storageAccountConnectionString": {
+      "type": "string"
+    },
+    "repoUrl": {
+      "type": "string"
+    },
+    "branch": {
+      "type": "string"
+    },
+    "ehConnectionString": {
+    "type": "string"  
+    }  
+  },
+  "variables": {
+    "webAppName": "[concat(parameters('configuration').projectName,'-webapp-',parameters('configuration').environment)]",
+    "serverFarmName": "[parameters('serverFarmName')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[variables('webAppName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "projectName": "[parameters('configuration').projectName]",
+        "environment": "[parameters('configuration').environment]"
+      },
+      "properties": {
+        "name": "[variables('webAppName')]",
+        "serverFarmId": "[resourceId(resourceGroup().name, 'Microsoft.Web/serverfarms', variables('serverFarmName'))]",
+        "siteConfig": {
+          "AlwaysOn": true,
+          "phpVersion": "Off"
+        }
+      },
+      "resources": [
+        { // App Connection Strings
+          "apiVersion": "2015-08-01",
+          "type": "config",
+          "name": "connectionstrings",
+          "dependsOn": [
+            "[variables('webAppName')]"
+          ],
+          "properties": {}
+        },
+        { // App Settings
+          "apiVersion": "2015-08-01",
+          "type": "Microsoft.Web/sites/config",
+          "name": "[concat(variables('webAppName'),'/appsettings')]",
+          "dependsOn": [
+            "[concat('Microsoft.Web/Sites/', variables('webAppName'))]"
+          ],
+          "properties": {
+            "WEBSITE_TIME_ZONE": "W. Europe Standard Time", //Set the site timezone to Amsterdam
+            "AzureWebJobsServiceBus": "[parameters('sbConnectionString')]",
+            "AzureWebJobsEventHub": "[parameters('ehConnectionString')]",
+            "AzureWebJobsDashboard": "[parameters('storageAccountConnectionString')]",
+            "AzureWebJobsStorage": "[parameters('storageAccountConnectionString')]",
+            "Topic": "[parameters('topicName')]",
+            "Subscription": "[parameters('subscriptionName')]",
+            "ProjectName": "[parameters('configuration').projectName]"
+          }
+        },
+        {
+          "apiVersion": "2015-08-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
+            "[concat('Microsoft.Web/Sites/', variables('webAppName'), '/config/appsettings')]"
+          ],
+          "properties": {
+            "RepoUrl": "[parameters('repoUrl')]",
+            "branch": "[parameters('branch')]",
+            "IsManualIntegration": true
+          }
+        }
+      ]
+    }
+  ]
+}

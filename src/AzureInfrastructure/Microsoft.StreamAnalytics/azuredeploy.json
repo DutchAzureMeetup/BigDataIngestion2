@@ -1,0 +1,147 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "configuration": {
+      "type": "object"
+    },
+    "eventHubNamespace": {
+      "type": "string"
+    },
+    "eventhubListenPolicyName": {
+      "type": "string"
+    },
+    "eventHubName": {
+      "type": "string"
+    },
+    "consumerGroupName": {
+      "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "serviceBusNamespace": {
+      "type": "string"
+    },
+    "serviceBusTopicName": {
+      "type": "string"
+    },
+    "serviceBusTopicPolicyName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "streamAnalyticsName": "[concat(parameters('configuration').projectName,'-sa-',parameters('configuration').environment)]",
+    "eventhubInputName": "thermostatingestioninput",
+    "blobOutputName": "thermostatingestionbloboutput",
+    "servicebusOutputName": "thermostatingestionservicebusoutput"
+
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[variables('streamAnalyticsName')]",
+      "type": "Microsoft.StreamAnalytics/StreamingJobs",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "projectName": "[parameters('configuration').projectName]",
+        "environment": "[parameters('configuration').environment]"
+      },
+      "properties": {
+        "sku": {
+          "name": "Standard"
+        },
+        "outputErrorPolicy": "stop",
+        "eventsOutOfOrderPolicy": "adjust",
+        "eventsOutOfOrderMaxDelayInSeconds": 0,
+        "eventsLateArrivalMaxDelayInSeconds": 5,
+        "dataLocale": "en-US",
+        "inputs": [
+          {
+            "name": "[variables('eventhubInputName')]",
+            "type": "Microsoft.StreamAnalytics/streamingjobs/inputs",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-06-01",
+            "properties": {
+              "type": "stream",
+              "serialization": {
+                "type": "JSON",
+                "properties": {
+                  "encoding": "UTF8"
+                }
+              },
+              "datasource": {
+                "type": "Microsoft.ServiceBus/EventHub",
+                "properties": {
+                  "serviceBusNamespace": "[parameters('eventHubNamespace')]",
+                  "sharedAccessPolicyName": "[parameters('eventhubListenPolicyName')]",
+                  "sharedAccessPolicyKey": "[listkeys(resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules', parameters('eventHubNamespace'), parameters('eventHubName'), parameters('eventhubListenPolicyName')), '2015-08-01').primaryKey]",
+                  "eventHubName": "[parameters('eventHubName')]",
+                  "consumerGroupName": "[parameters('consumerGroupName')]"
+                }
+              }
+            }
+          }
+        ],
+        "transformation": {
+          "name": "thermostatingestionquery",
+          "properties": {
+            "streamingUnits": 3,
+            "query": "[concat('SELECT *\r\nINTO   ', variables('blobOutputName') ,'\r\nFROM   ', variables('eventhubInputName'), ' TIMESTAMP BY Date\r\nPARTITION BY PartitionId\r\n\r\nSELECT CustomerId, COUNT(*) AS Count, AVG(ElectricityUsage)\r\nINTO   ',variables('servicebusOutputName'), '\r\nFROM   ',variables('eventhubInputName'),' TIMESTAMP BY Date\r\nGROUP BY CustomerId, HoppingWindow(second, 10 , 5)\r\n')]"
+          }
+        },
+        "outputs": [
+          {
+            "name": "[variables('blobOutputName')]",
+            "properties": {
+              "Serialization": {
+                "type": "CSV",
+                "properties": {
+                  "Encoding": "UTF8",
+                  "FieldDelimiter": "|"
+                }
+              },
+              "datasource": {
+                "type": "Microsoft.Storage/Blob",
+                "properties": {
+                  "StorageAccounts": [
+                    {
+                      "AccountKey": "[listKeys(resourceId(resourceGroup().name,'Microsoft.Storage/storageAccounts',parameters('storageAccountName')),'2016-01-01').keys[0].value]",
+                      "AccountName": "[parameters('storageAccountName')]"
+                    }
+                  ],
+                  "Container": "fromeventhub",
+                  "pathPattern": "thermostatdata/fdate={date}/{time}",
+                  "dateFormat": "yyyy-MM-dd",
+                  "timeFormat": "HH"
+                }
+              }
+            }
+          },
+          {
+            "name": "[variables('servicebusOutputName')]",
+            "properties": {
+              "Serialization": {
+                "type": "Json",
+                "properties": {
+                  "encoding": "UTF8",
+                  "format": "LineSeparated"
+                }
+              },
+              "datasource": {
+                "type": "Microsoft.ServiceBus/Topic",
+                "properties": {
+                  "topicName": "[parameters('serviceBusTopicName')]",
+                  "serviceBusNamespace": "[parameters('serviceBusNamespace')]",
+                  "sharedAccessPolicyName": "[parameters('serviceBusTopicPolicyName')]",
+                  "sharedAccessPolicyKey": "[listkeys(resourceId(resourceGroup().name,'Microsoft.ServiceBus/namespaces/authorizationRules', parameters('serviceBusNamespace'),parameters('serviceBusTopicPolicyName')), '2014-09-01').primaryKey]"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {}
+}
