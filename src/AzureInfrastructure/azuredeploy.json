@@ -32,7 +32,7 @@
       "businessUnit": "meetup",
       "environment": "[parameters('environment')]"
     },
-    "repoUrl": "https://github.com/DutchAzureMeetup/BigDataIngestion2.git",
+    "repoUrl": "https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2",
     "branch": "master",
     "resourceGroupName":  "[resourceGroup().name]",
     "sqlAdministratorLogin": "bigdatauser",
@@ -40,7 +40,7 @@
     "sqlEdition": "Basic",
     "hdInsightClusterLoginUserName": "bigdatauser",
     "hdInsightClusterLoginPassword": "@T0psecret12",
-    "hdInsightSshUserName": "bigdatauser",
+    "hdInsightSshUserName": "sshbigdatauser",
     "hdInsightSshPassword": "@T0psecret12"
   },
   "resources": [
@@ -74,6 +74,24 @@
         "templateLink": {
           //Dit must be a public url (in Linked template local file system is not supported)
           "uri": "[concat(variables('repoUrl'), '/', variables('branch'), '/src/AzureInfrastructure/Microsoft.Storage/azuredeploy.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "configuration": {
+            "value": "[variables('configuration')]"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "name": "StorageAccountOutput",
+      "type": "Microsoft.Resources/deployments",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          //Dit must be a public url (in Linked template local file system is not supported)
+          "uri": "[concat(variables('repoUrl'), '/', variables('branch'), '/src/AzureInfrastructure/Microsoft.Storage/azuredeployOutput.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -196,7 +214,7 @@
           "branch": {
             "value": "[variables('branch')]"
           },
-          "ehConnectionString":{
+          "ehConnectionString": {
             "value": "[reference('EventHub').outputs.EventHubSendOnlyConnectionString.value]"
           }
         }
@@ -225,6 +243,9 @@
           },
           "edition": {
             "value": "[variables('sqlEdition')]"
+          },
+          "requestedServiceObjectiveName": {
+            "value": "Basic"
           }
         }
       }
@@ -276,10 +297,10 @@
             "value": "[variables('hdInsightSshPassword')]"
           },
           "headVmSize": {
-            "value": "Standard_D1"
+            "value": "Standard_A3"
           },
           "workerVmSize": {
-            "value": "Standard_D1"
+            "value": "Standard_A3"
           },
           "sqlServerName": {
             "value": "[reference('Sql').outputs.sqlServerName.value]"
@@ -293,9 +314,6 @@
           "sqlDatabasePassword": {
             "value": "[variables('sqlAdministratorLoginPassword')]"
           },
-          "clusterWorkerNodeCount": {
-            "value": "1"
-          },
           "datalakeResourceGroupName": {
             "value": "[variables('resourceGroupName')]"
           },
@@ -307,6 +325,9 @@
           },
           "virtualNetworkResourceGroup": {
             "value": "[variables('resourceGroupName')]"
+          },
+          "clusterStorageAccountName": {
+            "value": "[reference('StorageAccountOutput').outputs.StorageAccountName.value]"
           }
         }
       }

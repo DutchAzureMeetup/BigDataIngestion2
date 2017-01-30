@@ -278,6 +278,7 @@
           "roles": [
             {
               "name": "headnode",
+			  "minInstanceCount": 1,
               "targetInstanceCount": "2",
               "hardwareProfile": {
                 "vmSize": "[parameters('headVmSize')]"
@@ -296,6 +297,7 @@
             {
               "name": "workernode",
               "targetInstanceCount": "[parameters('clusterWorkerNodeCount')]",
+			  "minInstanceCount": 1,
               "hardwareProfile": {
                 "vmSize": "[parameters('workerVmSize')]"
               },
