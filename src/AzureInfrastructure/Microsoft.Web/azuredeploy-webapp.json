@@ -20,7 +20,7 @@
     "storageAccountConnectionString": {
       "type": "string"
     },
-    "repoUrl": {
+    "repoGitUrl": {
       "type": "string"
     },
     "branch": {
@@ -89,7 +89,7 @@
             "[concat('Microsoft.Web/Sites/', variables('webAppName'), '/config/appsettings')]"
           ],
           "properties": {
-            "RepoUrl": "[parameters('repoUrl')]",
+            "RepoUrl": "[parameters('repoGitUrl')]",
             "branch": "[parameters('branch')]",
             "IsManualIntegration": true
           }
