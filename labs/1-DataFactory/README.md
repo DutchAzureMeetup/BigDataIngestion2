@@ -34,7 +34,7 @@
 
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/1-DataFactory/img/04createcontainer4.png)
 
-### The Azure Event Hubs Archive will now create a backup in AVRO format every 15 minutes in the storage account.
+### The Azure Event Hubs Archive will now create a backup in [AVRO](http://avro.apache.org/docs/current/) format every 15 minutes in the storage account.
 
 The archive service saves the blobs using the following structure in the storage account:
 
