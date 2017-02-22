@@ -32,11 +32,10 @@ In this lab we will copy all the data saved in the archive container (you did th
 
 You will need this values for the next step: 
 
-| ------------------------------ | -------------------------------------------------------------------------------------------- | 
-| **Storage Account Name:**      | pn123dev                                                                                     | 
-| **Storage Account Key:**       | kj47gsDyOSMEPu3QGfAvxWOBDpBZ/9U/xrnqfP5uwaK2N5hauoVzW4yLxRdaXabYOZaSEgiNYr0/s4FOaOhXww==     |
-
-
+| Kind | Value |
+| -------------------- | ------------------ |
+| **Storage Account Name:** | pn123dev | 
+| **Storage Account Key:**  | kj47gsDyOSMEPu3QGfAvxWOBDpBZ/9U/xrnqfP5uwaK2N5hauoVzW4yLxRdaXabYOZaSEgiNYr0/s4FOaOhXww== |
 
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/1-DataFactory/img/12.png)
 
