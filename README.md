@@ -3,7 +3,7 @@
 This is the repo for Part 2 of the Big Data Ingestion for the Dutch Azure Meetup (https://www.meetup.com/Dutch-Azure-Meetup/events/235816631/)
 
 
-Follow the labs in the "labs" folder.
+Follow the labs in the [labs](https://github.com/DutchAzureMeetup/BigDataIngestion2/tree/master/labs) folder.
 
 Eventually if you just want to see what will be created during the labs, follow this steps: 
 
