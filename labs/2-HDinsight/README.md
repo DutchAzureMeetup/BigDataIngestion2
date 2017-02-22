@@ -51,12 +51,14 @@ When the kernel is working you will see the white-circle being black. And the ce
 
 ### Access data with HDFS
 
-You can execute shell (OS-commands) when prefix with **!**[command] 
+You can execute shell (OS-commands) when prefixed with **!**.
 
 You can interact with HDFS-api to access your storage account. For this to work you need to add you credentials in the Hadoop configuration on the system.
 
 - storage-account: pn123dev
 - container: meetup
+
+> A storage-account is only accessible when the accountname and key or SAS-token are added to the hadoop configuration (core-site.xml) though Ambari. We have prepared this for this account. 
 
 Use the HDFS command to see if your user folder is created and contains some data files.
 
