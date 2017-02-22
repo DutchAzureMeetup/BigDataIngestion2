@@ -9,36 +9,48 @@ Enable the Event Hub Archive service to automatically save every minute the Even
 
 ## Let's start where we left off:
 
-1. Click this button (hold CTRL while clicking to open in a new tab):
+### **Step 1**
+Click this button (hold CTRL while clicking to open in a new tab):
 
     <a target="_blank" id="deploy-to-azure"  href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FDutchAzureMeetup%2FBigDataIngestion1%2Fmaster%2Fsrc%2FAzureInfrastructure%2Fazuredeploy.json"><img src="http://azuredeploy.net/deploybutton.png"/></a>
 
-2. Fill the required settings:
+### **Step 2**
+Fill the required settings:
 
     ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/img/intro.png)
 
-3. Wait until the deployment finishes (it should take no more than 10 minutes).
+### **Step 3**
+Wait until the deployment finishes (it should take no more than 10 minutes).
 
 ## Enable the Azure Event Hubs Archive 
 
-4. Go to the newly crated Resource Group and select the Event Hub:
+### **Step 4**
+Go to the newly crated Resource Group and select the Event Hub:
 
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04eventhubnamespaceselect.png)
 
+### **Step 5**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04eventhubselect.png)
 
+### **Step 6**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04eventhubpropertiesselect.png)
-  
+
+### **Step 7**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04eventhuarchivesetuppng.png)
-  
+
+### **Step 8**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04storageselect.png)
- 
+
+### **Step 9**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04createcontainer1.png)
 
+### **Step 10**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04createcontainer2.png)
 
+### **Step 11**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04createcontainer3.png)
 
+### **Step 12**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/0-Preparation/img/04createcontainer4.png)
 
 ### The Azure Event Hubs Archive will now create a backup in [AVRO](http://avro.apache.org/docs/current/) format every 15 minutes in the storage account.
