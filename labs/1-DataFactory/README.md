@@ -30,7 +30,7 @@ In this lab we will copy all the data saved in the archive container (you did th
 
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/1-DataFactory/img/11.png)
 
-You will need this values for the next step: 
+**You will need this values for the next step:** 
 
 | Kind | Value |
 | -------------------- | ------------------ |
