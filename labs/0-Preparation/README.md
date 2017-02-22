@@ -17,7 +17,7 @@ Enable the Event Hub Archive service to automatically save every minute the Even
 
     ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion1/master/img/intro.png)
 
-3. Wait until the deployment finish
+3. Wait until the deployment finishes (it should take no more than 10 minutes).
 
 ## Enable the Azure Event Hubs Archive 
 
