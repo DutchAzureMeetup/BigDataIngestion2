@@ -5,7 +5,7 @@ But there's also another way to accomplish the same, a new feauture called [Even
 We will use this feature because it's able to save the data more often (1 minute) than Stream Analytics (1 hour), which is useful for this Meetup to save data faster. 
 
 ## Goal
-Enable the Event Hub Archive service to automatically save every minute the Event Hub messages in an Azure blob storage.  
+Enable the Event Hub Archive service to automatically saves every minute the Event Hub messages in an Azure blob storage.  
 
 ## Let's start where we left off:
 
