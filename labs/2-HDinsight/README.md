@@ -115,15 +115,16 @@ If you are done you might stop your session to not use too many resources on the
 ```python
 spark.stop()
 ```
+Now that you have a spark-session you will claim memory and CPU power from the cluster. You can view this at the YARN-resource manager. Check your load on the cluster: [YARN-resource manager](https://pn1234-hdi-dev.azurehdinsight.net/yarnui/hn/cluster/scheduler). At the YARN resource manager you can click on you application to view the logs and SparkUI. In this lab we will not go into these details.
 
-Because the filenames do not and on avro we need to set a specific hadoop option:
+Because the filenames do not and on filename._avro_ we need to set a specific hadoop option to allow these files created by the datafactory to be picked up:
 
 ```python
 hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
 hadoop_conf.set('avro.mapred.ignore.inputs.without.extension', 'false')
 ```
 
-Now we are able to load our data is a Spark DataFrame (in memory | column oriented data scructure) docs: [spark-avro](https://github.com/databricks/spark-avro#python-api)
+We are able to load our data is a Spark DataFrame (in memory | column oriented data scructure) docs: [spark-avro](https://github.com/databricks/spark-avro#python-api)
 
 ```python
 input_sdf = (
