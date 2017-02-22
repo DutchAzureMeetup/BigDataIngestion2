@@ -1,10 +1,12 @@
 # Big Data Ingestion Part 2
-## Create a Data Factory  
 
-Let's create our first copy activity in Data Factory!
+## Goal
 
 In this lab we will copy all the data saved in the archive container (you did this in the [preparation](https://github.com/DutchAzureMeetup/BigDataIngestion2/tree/master/labs/0-Preparation) lab) to the HDInsight cluster storage.   
 
+## Create a Data Factory  
+
+Let's create our first copy activity in Data Factory!
 
 1. Go the Resource Group created during the preparation lab:
 
