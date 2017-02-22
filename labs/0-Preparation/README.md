@@ -1,5 +1,12 @@
 # Big Data Ingestion Part 2
 
+In the previous Meetup we were using Stream Analytics to save data from the Event Hub to an Azure blob storage account. 
+But there's also another way to accomplish the same, a new feauture called [Event Hub Archive](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-archive-overview). 
+We will use this feature because it's able to save the data more often (1 minute) than Stream Analytics (1 hour), which is useful for this Meetup to save data faster. 
+
+## Goal
+Enable the Event Hub Archive service to automatically save every minute the Event Hub messages in an Azure blob storage.  
+
 ## Let's start where we left off:
 
 1. Click this button (hold CTRL while clicking to open in a new tab):
