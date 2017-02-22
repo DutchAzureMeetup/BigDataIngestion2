@@ -36,13 +36,14 @@
 
 ### The Azure Event Hubs Archive will now create a backup in [AVRO](http://avro.apache.org/docs/current/) format every 15 minutes in the storage account.
 
-The archive service saves the blobs using the following structure in the storage account:
+The archive service saves the blobs using the following structure in the storage account container (named archive) we have created:
 
 * eventhub namespace
     * eventhub name
-        * partition #
-            * container 
-                * year
-                    * hour
-                        * minutes (every 15 minutes) -> here the AVRO file blob
+        * partition # (in our case 0 and 1)         
+            * year
+                * month
+                    * day
+                        * hour
+                            * minutes (every 1 minute) -> here in is the AVRO file blob
                         
