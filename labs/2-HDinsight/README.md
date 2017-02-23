@@ -71,7 +71,7 @@ Use the HDFS command to see if your user folder is created and contains some dat
 
 container_url='wasbs://meetup@pn123dev.blob.core.windows.net/'
 user='YourUserFolder'
-folder='dambd/*/2017/02/*/*/'
+folder='dambd/*/2017/02/*/*/*'
 
 # recursive list all files, print only first items:
 !hdfs dfs -ls -R -h $container_url/$user/$folder | head -n10
