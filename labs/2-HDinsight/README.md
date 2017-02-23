@@ -31,17 +31,21 @@ For this lab we have created a extra gateway node to work with multiple users on
 
 You can access a personal Jupyter instance per user:
 
-https://meetup-custom-gateway.westeurope.cloudapp.azure.com:8000/user/[username]
+[https://meetup-custom-gateway.westeurope.cloudapp.azure.com:8000/](https://meetup-custom-gateway.westeurope.cloudapp.azure.com:8000/)
 
-You can login with a predefined password.
+You can login with a predefined username / password which will be writen on the board.
 
 ### Create a new Notebook
 
-- First we need to create an new notebook:
+- First we need to create a new notebook:
 
 ![](img/create_new_notebook.png)
 
-You should give your notebook a meaningfull name and save it. You can see which kernel you are using. The Python 3.5 kernel is installed and managed by Conda in our case [conda root]. You can install many kernels; for Scala, R, Python2/3, PySpark and other languages. 
+You should give your notebook a meaningfull name and save it. Now you can close the brower or tab and re-open it from the root directory later on.
+
+In your notebook you can see which kernel you are using. The Python 3.5 kernel is installed and managed by Conda in our case **[conda root]**. 
+
+Jupyter can have many kernels; for Scala, R, Python2/3, PySpark and other languages. 
 
 On the HDInsight-cluster there are some more kernels prepared. We have prepared only this kernel which is suiteable for Spark coded in Python.
 
@@ -65,7 +69,7 @@ Use the HDFS command to see if your user folder is created and contains some dat
 ```shell
 !hdfs dfs -ls wasbs://[CONTAINER]@[STORAGEACCOUNT].blob.core.windows.net/
 
-container_url='wasbs://.....windows.net/'
+container_url='wasbs://meetup@pn123dev.blob.core.windows.net/'
 user='YourUserFolder'
 folder='dambd/*/2017/02/*/*/'
 
@@ -73,7 +77,7 @@ folder='dambd/*/2017/02/*/*/'
 !hdfs dfs -ls -R -h $container_url/$user/$folder | head -n10
 
 # Look at the content of a single file, the first 1000 characters:
-!hdfs dfs -cat wasbs://..... | head -c 1000
+!hdfs dfs -cat wasbs://meetup@pn123dev.blob.core.windows.net/PATH_TO_1_FILE/ | head -c 1000
 ```
 
 First bytes show its Avro, with the schema. The rest is serialized data. More info about [AVRO](https://avro.apache.org/docs/current/). Lets see how 'big' our dataset is:
@@ -126,7 +130,7 @@ hadoop_conf = spark.sparkContext._jsc.hadoopConfiguration()
 hadoop_conf.set('avro.mapred.ignore.inputs.without.extension', 'false')
 ```
 
-We are able to load our data is a Spark DataFrame (in memory | column oriented data scructure) docs: [spark-avro](https://github.com/databricks/spark-avro#python-api)
+We are able to load our data is a Spark DataFrame `input_sdf` (in memory | column oriented data scructure) docs: [spark-avro](https://github.com/databricks/spark-avro#python-api)
 
 ```python
 input_sdf = (
@@ -137,13 +141,14 @@ input_sdf = (
 input_sdf.show(n=5)
 input_sdf.count()
 ```
+
 The count() function wil actually load all the data and count all the rows available.
 
 You might have some data in your DataFrame, like me:
 
 ![loaded_input_df](img/notebook_input_df.png)
 
-The headers are present, but we have to convert the Body, because it looks like a byte-array. We store this in a new DataFrame called `meter_data_df`. This was a bit of a challange and there might be better ways, but we managed to transform the Boty field into a usefull DataFrame. Docs: [spark.functions](http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#module-pyspark.sql.functions) 
+The headers are present, but we have to convert the Body, because it looks like a byte-array. We store this in a new DataFrame called `meter_sdf`. This was a bit of a challange and there might be better ways, but we managed to transform the Boty field into a usefull DataFrame. Docs: [spark.functions](http://spark.apache.org/docs/latest/api/python/pyspark.sql.html#module-pyspark.sql.functions) 
 
 ```python
 from pyspark.sql import functions as F
@@ -215,8 +220,9 @@ group by
     CustomerId
 """).show()
 ```
+
 ## End
 
-If you want, you can view a fully working notebook in the solutions folder on git.
+If you want, you can view a fully working [notebook](https://github.com/abij/BigDataIngestion2/blob/master/labs/2-HDinsight/solution/process_meter_data.ipynb) in the solutions folder on git.
 
 
