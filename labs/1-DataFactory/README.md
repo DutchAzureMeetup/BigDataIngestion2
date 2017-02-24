@@ -49,8 +49,8 @@ Go to the Resource Group created during the preparation lab:
 
 | Kind | Value |
 | -------------------- | ------------------ |
-| **Storage Account Name:** | pn123dev | 
-| **Storage Account Key:**  | kj47gsDyOSMEPu3QGfAvxWOBDpBZ/9U/xrnqfP5uwaK2N5hauoVzW4yLxRdaXabYOZaSEgiNYr0/s4FOaOhXww== |
+| **Storage Account Name:** | trainingbdi | 
+| **Storage Account Key:**  | tmZ03+ZTJ5W+M3VR3z/ID80vGRyWY8aUhNsbdewCuBikprMYWLm3lli2Gk9qaa5vkLQ3OIm/g5mdEYDJmRAP9Q== |
 
 ### **Step 13**
    ![](https://raw.githubusercontent.com/DutchAzureMeetup/BigDataIngestion2/master/labs/1-DataFactory/img/12.png)
